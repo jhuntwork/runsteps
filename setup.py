@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
@@ -38,7 +38,7 @@ setup(
     ],
 
     keywords='scripting automation',
-    packages='runsteps',
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     entry_points={
         'console_scripts': [
             'runsteps=runsteps:main',
