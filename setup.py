@@ -20,7 +20,7 @@ setup(
     author_email='jhuntwoarrk@lightcubesolutions.com',
     license='MIT',
 
-    version='0.0.0',
+    version='0.1.0',
     zip_safe=True,
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
