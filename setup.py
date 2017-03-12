@@ -39,9 +39,6 @@ setup(
 
     keywords='scripting automation',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    entry_points={
-        'console_scripts': [
-            'runsteps=runsteps:main',
-        ],
-    },
+
+    entry_points={'console_scripts': ['runsteps=runsteps:main']}
 )
