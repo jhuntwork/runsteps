@@ -166,7 +166,6 @@ class RunnerTest(unittest.TestCase):
                           '[ "$RUNSTEPS_TESTING" = "YES" ] || exit 1\n'
                           '. "$RUNSTEPS_ENV/runsteps_helpers.sh"\n'
                           'runsteps_save_keypair RUNSTEPS_TESTING NO\n'
-                          'sleep 1\n'
                           'runsteps_save_keypair RUNSTEPS_TESTING MAYBE\n'}
         fill_directory(self.tempdir, files)
         self.runner.load_from_dir(self.tempdir)

@@ -16,7 +16,8 @@ runsteps_save_keypair () {
     key=$1
     shift
     val=$@
-    tmpfile="${RUNSTEPS_DATA}/env/$(date +%s).json"
+    mill_time=$(python -c 'import time; print(int(round(time.time() * 1000)))')
+    tmpfile="${RUNSTEPS_DATA}/env/${mill_time}.json"
     printf '{"%s": "%s"}\n' "$key" "$val" >"$tmpfile"
 }
 """
@@ -34,7 +35,7 @@ def _find_top_level_files(directory):
         A list of paths to files existing in the given directory
     """
     (path, dirs, files) = next(os.walk(directory))
-    return [os.path.abspath('/'.join([path, item])) for item in files]
+    return sorted([os.path.abspath('/'.join([path, item])) for item in files])
 
 
 def _assert_is_list(obj):
@@ -226,7 +227,7 @@ class Runner(object):
         for newfile in _find_top_level_files(directory):
             if os.access(newfile, os.X_OK):
                 executables_found.append(newfile)
-        self.load(sorted(executables_found))
+        self.load(executables_found)
 
     def load_from_file(self, jsonfile):
         """Open jsonfile, parse its contents, and if it contains a single
