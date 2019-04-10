@@ -158,6 +158,8 @@ class Runner(object):
                 An output fd, or None, if quiet is requested.
         """
         _assert_is_list(self._steps)
+        logging.debug('Going to execute these steps: %s', self._steps)
+        run_ts = _format_time(time.time(), format_string='%Y%m%d%H%M%S')
 
         if inherit_env:
             self._env.update(os.environ)
@@ -171,16 +173,19 @@ class Runner(object):
             # login environment may have changed
             if inherit_env:
                 shell = os.getenv('SHELL', '/bin/sh')
+                logging.debug(
+                        'Retrieving and setting the login environment for %s',
+                        shell)
                 envs = subprocess.check_output(
                     [shell, '-l', '-c', PYENVCMD.format(sys.executable)])
                 self._env.update(json.loads(envs))
 
-            logging.debug('Running step: %s', step)
+            logging.info('Running step: %s', step)
             start = time.time()
-            start_ts = _format_time(start, format_string="%Y%m%d%H%M%S")
             if logs:
-                base = '{}-{}.log'.format(os.path.basename(step), start_ts)
+                base = '{}-{}.log'.format(run_ts, os.path.basename(step))
                 logfile = '/'.join([self.logdir, base])
+                logging.debug('Sending output to logfile: %s', logfile)
                 logfd = open(logfile, 'w')
             try:
                 returncode = self._execute_step(step, logfd, out)
@@ -263,14 +268,10 @@ def main(args=sys.argv[1:]):
         action='store_false',
         help='disable the creation of log files for each step')
     exclusive.add_argument(
-        '-q', '--quiet',
-        action='store_false',
-        dest='out',
-        default=sys.stdout,
-        help='do not write step output to stdout')
-    exclusive.add_argument(
         '-v', '--verbose',
-        action='store_true')
+        action='count',
+        default=0,
+        help='if specified twice, output from steps will also be printed')
     mainparser.add_argument(
         'path',
         help='a directory containing executables to run in alphabetical '
@@ -278,10 +279,13 @@ def main(args=sys.argv[1:]):
              'sequentially')
     parser = mainparser.parse_args(args)
 
-    if parser.verbose:
+    loglevel = logging.INFO
+    out = None
+    if parser.verbose > 0:
         loglevel = logging.DEBUG
-    else:
-        loglevel = logging.INFO
+    if parser.verbose > 1:
+        out = sys.stdout
+
     logging.basicConfig(
         level=loglevel,
         format='%(asctime)s %(levelname)-6s %(message)s')
@@ -291,4 +295,4 @@ def main(args=sys.argv[1:]):
     if parser.dryrun:
         runner.dryrun()
     else:
-        runner.run(inherit_env=parser.ienv, logs=parser.logs, out=parser.out)
+        runner.run(inherit_env=parser.ienv, logs=parser.logs, out=out)

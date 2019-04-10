@@ -111,7 +111,7 @@ class RunnerTest(unittest.TestCase):
         fill_directory(self.tempdir, files)
         self.runner.load_from_path(self.tempdir)
         self.runner.run(out=out)
-        logfiles = glob.glob('{}/test1.sh*.log'.format(self.runner.logdir))
+        logfiles = glob.glob('{}/*test1.sh.log'.format(self.runner.logdir))
         self.assertTrue(logfiles)
         with open(logfiles[0], 'r') as logfile:
             output_fromfile = logfile.read()
@@ -123,16 +123,6 @@ class RunnerTest(unittest.TestCase):
         self.runner.load(self.steps)
         self.runner.run(logs=False)
         self.assertFalse(glob.glob('{}/*.log'.format(self.runner.logdir)))
-
-    def test_run_with_quiet_still_produces_logs(self):
-        """Test setting output to None still produces logs"""
-        self.runner.load(self.steps)
-        self.runner.run(out=None)
-        logfiles = glob.glob('{}/*.log'.format(self.runner.logdir))
-        self.assertTrue(logfiles)
-        with open(logfiles[0], 'r') as logfile:
-            output_fromfile = logfile.read()
-        self.assertTrue(output_fromfile)
 
     def test_run_halts_execution_when_a_command_fails(self):
         """run should not execute the rest of the steps when one fails"""
@@ -286,3 +276,12 @@ class RunnerTest(unittest.TestCase):
                              'echo "blah"\n'}
         fill_directory(self.tempdir, files)
         runsteps.main(args=['-v', self.tempdir])
+
+    def test_main_double_verbose(self):
+        """Execute the main function with the verbose flag twice.
+           Currently this test is pretty meaningless.
+        """
+        files = {'test1.sh': '#!/bin/sh\n'
+                             'echo "blah"\n'}
+        fill_directory(self.tempdir, files)
+        runsteps.main(args=['-vv', self.tempdir])
