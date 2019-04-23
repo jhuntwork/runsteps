@@ -17,10 +17,10 @@ setup(
 
     # Author details
     author='Jeremy Huntwork',
-    author_email='jhuntwoarrk@lightcubesolutions.com',
+    author_email='jhuntwork@lightcubesolutions.com',
     license='MIT',
 
-    version='0.3.0',
+    version='0.5.0',
     zip_safe=True,
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -31,10 +31,9 @@ setup(
         'Intended Audience :: System Administrators',
         'Topic :: Utilities',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 
     keywords='scripting automation',

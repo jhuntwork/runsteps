@@ -1,5 +1,6 @@
 """Unit tests for the Runner Class"""
 import glob
+import io
 import json
 import os
 import random
@@ -9,18 +10,14 @@ import string
 import tempfile
 import unittest
 
-try:
-    import StringIO as io
-except ImportError:
-    import io
-
 import runsteps
 
 
 def fill_directory(path, files):
     """Populate a directory with empty files
     Args:
-        files: A dictionary where the keys are filenames and the value is
+        path: The name of a directory for storing the empty files
+        files: A dictionary where the keys are file names and the value is
                a string of content to fill the file. None or False as values
                will create the file without content and without the executable
                bit.
@@ -70,6 +67,7 @@ class RunnerTest(unittest.TestCase):
     def test_load_only_allows_lists(self):
         """New instances will raise an Exception if given a non-list object"""
         steps = 'This is not a list'
+        # noinspection PyTypeChecker
         with self.assertRaises((runsteps.RunnerException, SystemExit)):
             self.runner.load(steps)
 
@@ -90,14 +88,15 @@ class RunnerTest(unittest.TestCase):
         """Call run with the path specified as a file"""
         steps = ['ls', 'pwd', 'env']
         tempfile_name = '/'.join([self.tempdir, 'steps.json'])
-        with open(tempfile_name, 'w') as tempfile:
-            json.dump(steps, tempfile)
+        with open(tempfile_name, 'w') as tmpfile:
+            json.dump(steps, tmpfile)
         self.runner.load_from_path(tempfile_name)
         self.runner.run()
         self.assertEqual(steps, self.runner._steps)
 
     def test_load_from_path_with_a_bad_path(self):
         """Call run with a bad path"""
+        # noinspection PyTypeChecker
         with self.assertRaises((runsteps.RunnerException, SystemExit)):
             self.runner.load_from_path('this_is_not_a_file')
 
@@ -128,6 +127,7 @@ class RunnerTest(unittest.TestCase):
         """run should not execute the rest of the steps when one fails"""
         steps = ['true', 'false', 'ls']
         self.runner.load(steps)
+        # noinspection PyTypeChecker
         with self.assertRaises((runsteps.RunnerException, SystemExit)):
             self.runner.run()
         executed_steps = [x['step'] for x in self.runner.history]
@@ -137,7 +137,7 @@ class RunnerTest(unittest.TestCase):
         """Test that the step receives existing environment variables when
            inherit_env is true.
         """
-        val = ''.join(random.choice(string.ascii_lowercase) for x in range(6))
+        val = ''.join(random.choice(string.ascii_lowercase) for _ in range(6))
         os.putenv('RUNSTEPS_TESTENV_VAR', val)
         self.runner.load(self.steps)
         self.runner.run(inherit_env=True)
@@ -167,6 +167,7 @@ class RunnerTest(unittest.TestCase):
         """Test that a dryrun only prints output"""
         self.runner.load(self.steps)
         out = io.StringIO()
+        # noinspection PyTypeChecker
         with self.assertRaises(SystemExit):
             self.runner.dryrun(out=out)
         self.assertFalse(self.runner.history)
@@ -182,9 +183,10 @@ class RunnerTest(unittest.TestCase):
         """Test that encountering a bad executable raises RunnerException"""
         steps = ['step1.sh', 'step2.sh', 'step3.sh']
         tempfile_name = '/'.join([self.tempdir, 'steps.json'])
-        with open(tempfile_name, 'w') as tempfile:
-            json.dump(steps, tempfile)
+        with open(tempfile_name, 'w') as tmpfile:
+            json.dump(steps, tmpfile)
         self.runner.load_from_path(tempfile_name)
+        # noinspection PyTypeChecker
         with self.assertRaises((runsteps.RunnerException, SystemExit)):
             self.runner.run(logs=False)
         self.assertTrue(len(self.runner.history) == 1)
@@ -230,8 +232,8 @@ class RunnerTest(unittest.TestCase):
         """load_from_file will fill self._steps with data from a json file"""
         steps = ['step1.sh', 'step2.sh', 'step3.sh']
         tempfile_name = '/'.join([self.tempdir, 'steps.json'])
-        with open(tempfile_name, 'w') as tempfile:
-            json.dump(steps, tempfile)
+        with open(tempfile_name, 'w') as tmpfile:
+            json.dump(steps, tmpfile)
         self.runner.load_from_file(tempfile_name)
         self.assertEqual(steps, self.runner._steps)
 
@@ -248,6 +250,7 @@ class RunnerTest(unittest.TestCase):
     def test_print_history_IOError(self):
         """Test that an exit occurs when the history file cannot be read"""
         shutil.rmtree(self.runner.datadir)
+        # noinspection PyTypeChecker
         with self.assertRaises((runsteps.RunnerException, SystemExit)):
             self.runner.print_history()
 
@@ -255,6 +258,7 @@ class RunnerTest(unittest.TestCase):
         """Execute the main function with the help flag.
            Currently this test is pretty meaningless.
         """
+        # noinspection PyTypeChecker
         with self.assertRaises(SystemExit):
             runsteps.main(args=['-h'])
 
@@ -265,7 +269,8 @@ class RunnerTest(unittest.TestCase):
         files = {'test1.sh': '#!/bin/sh\n'
                              'echo "blah"\n'}
         fill_directory(self.tempdir, files)
-        with self.assertRaises((SystemExit)):
+        # noinspection PyTypeChecker
+        with self.assertRaises(SystemExit):
             runsteps.main(args=['-d', self.tempdir])
 
     def test_main_verbose(self):

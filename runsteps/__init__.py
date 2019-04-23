@@ -56,7 +56,7 @@ def _format_time(epoch_time, format_string="%Y-%m-%d %H:%M:%S"):
 class RunnerException(Exception):
     """A simple exception that doesn't output a stack trace"""
     def __init__(self, message, return_code=1):
-        super(RunnerException, self).__init__(message)
+        super().__init__(message)
         logging.error('%s', message)
         sys.exit(return_code)
 
@@ -182,6 +182,7 @@ class Runner(object):
 
             logging.info('Running step: %s', step)
             start = time.time()
+            returncode = -1
             if logs:
                 base = '{}-{}.log'.format(run_ts, os.path.basename(step))
                 logfile = '/'.join([self.logdir, base])
