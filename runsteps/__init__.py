@@ -8,6 +8,8 @@ import subprocess
 import sys
 import time
 
+import tqdm
+
 HELPER_FUNC = """
 runsteps_save_keypair () {
     [ -n "$1" ] || return 1
@@ -164,7 +166,12 @@ class Runner(object):
         if inherit_env:
             self._env.update(os.environ)
 
-        for step in self._steps:
+        if out is None:
+            steps = tqdm.tqdm(self._steps)
+        else:
+            steps = self._steps
+
+        for step in steps:
             logfd = None
 
             # Update the environment again, based on what the user with a
@@ -180,7 +187,6 @@ class Runner(object):
                     [shell, '-l', '-c', PYENVCMD.format(sys.executable)])
                 self._env.update(json.loads(envs))
 
-            logging.info('Running step: %s', step)
             start = time.time()
             returncode = -1
             if logs:
@@ -283,6 +289,7 @@ def main(args=sys.argv[1:]):
     loglevel = logging.INFO
     out = None
     if parser.verbose > 0:
+        out = False
         loglevel = logging.DEBUG
     if parser.verbose > 1:
         out = sys.stdout

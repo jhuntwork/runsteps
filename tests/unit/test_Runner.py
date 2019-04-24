@@ -144,6 +144,11 @@ class RunnerTest(unittest.TestCase):
         self.assertTrue('RUNSTEPS_TESTENV_VAR' in self.runner._env)
         self.assertEqual(self.runner._env['RUNSTEPS_TESTENV_VAR'], val)
 
+    def test_run_without_verbose(self):
+        """Test run without an output fd specified"""
+        self.runner.load(self.steps)
+        self.runner.run(out=None)
+
     def test_run_saved_keypairs_are_preserved_as_environment_variables(self):
         """Test that environment variables stored as keypairs in the
            RUNSTEPS_DATA directory are passed from step to step.
