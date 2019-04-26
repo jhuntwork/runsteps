@@ -20,7 +20,7 @@ setup(
     author_email='jhuntwork@lightcubesolutions.com',
     license='MIT',
 
-    version='0.5.0',
+    version='0.5.1',
     zip_safe=True,
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -38,6 +38,6 @@ setup(
 
     keywords='scripting automation',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-
-    entry_points={'console_scripts': ['runsteps=runsteps:main']}
+    entry_points={'console_scripts': ['runsteps=runsteps:main']},
+    install_requires=['tqdm']
 )
